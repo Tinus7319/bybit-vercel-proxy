@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     return;
   }
 
-  const baseUrl = "https://api.bybitapi.com";
+  const baseURL = "https://api.bybit.com";
   const timestamp = Date.now().toString();
 
   const body = {
