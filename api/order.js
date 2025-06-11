@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     return;
   }
 
-  const baseURL = "https://api.bybit.com"; // ✅ Juiste naam
+  const baseURL = "https://api.bybit.com";
   const timestamp = Date.now().toString();
 
   const body = {
@@ -29,10 +29,20 @@ export default async function handler(req, res) {
   };
 
   const bodyStr = JSON.stringify(body);
+
   const sign = crypto
     .createHmac("sha256", API_SECRET)
     .update(timestamp + API_KEY + bodyStr)
     .digest("hex");
+
+  // ✅ DEBUG LOGS
+  console.log("=== Bybit Order Debug ===");
+  console.log("Base URL:", baseURL);
+  console.log("Request body:", bodyStr);
+  console.log("Timestamp:", timestamp);
+  console.log("API Key:", API_KEY);
+  console.log("Signature:", sign);
+  console.log("=========================");
 
   try {
     const response = await fetch(`${baseURL}/v5/order/create`, {
@@ -46,8 +56,17 @@ export default async function handler(req, res) {
       body: bodyStr,
     });
 
-    const json = await response.json();
-    res.status(response.status).json(json);
+    const text = await response.text();
+
+    // Probeer JSON te parsen, maar geef duidelijke fout als het geen JSON is
+    try {
+      const json = JSON.parse(text);
+      res.status(response.status).json(json);
+    } catch (parseError) {
+      console.error("Response is not valid JSON:", text);
+      res.status(500).json({ error: "Invalid JSON response", raw: text });
+    }
+
   } catch (error) {
     console.error("Request failed:", error);
     res.status(500).json({ error: "Internal Server Error", details: error.message });
