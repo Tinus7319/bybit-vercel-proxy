@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     return;
   }
 
-  const baseURL = "https://api.bybit.com";
+  const baseURL = "https://api.bybit.com"; // ✅ Juiste naam
   const timestamp = Date.now().toString();
 
   const body = {
@@ -34,17 +34,22 @@ export default async function handler(req, res) {
     .update(timestamp + API_KEY + bodyStr)
     .digest("hex");
 
-  const response = await fetch(`${baseUrl}/v5/order/create`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-BAPI-API-KEY": API_KEY,
-      "X-BAPI-TIMESTAMP": timestamp,
-      "X-BAPI-SIGN": sign,
-    },
-    body: bodyStr,
-  });
+  try {
+    const response = await fetch(`${baseURL}/v5/order/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-BAPI-API-KEY": API_KEY,
+        "X-BAPI-TIMESTAMP": timestamp,
+        "X-BAPI-SIGN": sign,
+      },
+      body: bodyStr,
+    });
 
-  const json = await response.json();
-  res.status(response.status).json(json);
+    const json = await response.json();
+    res.status(response.status).json(json);
+  } catch (error) {
+    console.error("Request failed:", error);
+    res.status(500).json({ error: "Internal Server Error", details: error.message });
+  }
 }
