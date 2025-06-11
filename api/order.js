@@ -40,8 +40,7 @@ export default async function handler(req, res) {
   console.log("Base URL:", baseURL);
   console.log("Request body:", bodyStr);
   console.log("Timestamp:", timestamp);
-  console.log("API Key:", API_KEY);
-  console.log("Signature:", sign);
+  console.log("Sending request to Bybit...");
   console.log("=========================");
 
   try {
